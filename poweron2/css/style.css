@@ -1,0 +1,402 @@
+/* ==========================================
+   フォントのおしゃれ化（Google Fontsの読み込み）
+========================================== */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+
+/* 英文をおしゃれでスタイリッシュなフォントに */
+.eng-sentence, 
+#recognizedTextDisplay, 
+.target-text-display,
+.hud-value,
+.num {
+    font-family: 'Nunito', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    letter-spacing: 0.5px;
+}
+
+/* 日本語訳をモダンで読みやすいフォントに */
+.jpn-sentence, 
+.jpn-container-style {
+    font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif !important;
+    letter-spacing: 0.5px;
+}
+/* ------------------------------------------- */
+
+/* =========================================
+   基本設定とベースレイアウト (PC & iPad 共通フィット)
+========================================= */
+html, body { 
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important; /* SafariのURLバー対策。画面高さにピッタリ合わせる */
+    overflow: hidden !important; /* 画面全体の無駄なスクロールを完全禁止 */
+    background-color: #f5f5f5;
+    box-sizing: border-box;
+    display: flex !important;
+    flex-direction: column !important; /* 上(Nav)・下(App)に縦並び */
+    touch-action: none !important; /* iPadでの意図しないスワイプ動作を防止 */
+}
+
+/* --- ナビゲーション（上部レッスンボタン） --- */
+.nav-container { 
+    width: 100% !important; 
+    flex: 0 0 auto !important; /* 高さを内容に合わせて固定（伸び縮みさせない） */
+    display: grid; 
+    grid-template-columns: repeat(10, 1fr); 
+    gap: 1px; 
+    padding: 4px;
+    box-sizing: border-box;
+    z-index: 100;
+}
+.nav-btn { 
+    position: relative; font-size: 1.2rem; font-weight: 900; color: #888; background: #f8f9fa; 
+    border: 2px solid #ddd; border-radius: 12px; padding: 10px 5px; cursor: pointer; 
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.3s ease; 
+}
+.nav-btn .num { font-size: 2.2rem; vertical-align: middle; }
+.nav-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+.nav-btn.active { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.25); border-color: transparent; color: #333; z-index: 10;}
+.nav-btn.active::before {
+    content: ""; position: absolute; top: 4px; left: 4px; right: 4px; bottom: 4px; 
+    border: 2px dashed rgba(255, 255, 255, 0.9); border-radius: 8px; pointer-events: none;
+}
+.nav-btn.active.color-blue   { background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); }
+.nav-btn.active.color-orange { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); }
+.nav-btn.active.color-purple { background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%); }
+.nav-btn.active.color-green  { background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%); }
+.nav-btn.active.color-pink   { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); }
+
+/* =========================================
+   メインコンテナとエリア分割 (下部エリア)
+========================================= */
+.app-container { 
+    width: 100%; 
+    flex: 1 1 0 !important; /* 残りの高さをすべて埋める */
+    display: flex !important; 
+    flex-direction: row !important; /* 左(Main)・右(Sidebar)に横並び */
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2); 
+    border-radius: 8px; 
+    overflow: hidden !important; 
+    position: relative; 
+    background-color: white;
+    margin-bottom: 4px; /* 下部に少しだけ余白 */
+}
+
+/* --- 左側の広いエリア（背景画像対応） --- */
+.main-screen { 
+    position: relative !important; 
+    display: flex !important; 
+    flex-direction: column !important; 
+    flex-grow: 1 !important; 
+    height: 100% !important; /* 高さを100%に固定 */
+    overflow-y: auto !important; /* 中身が溢れた時だけスクロール */
+    -webkit-overflow-scrolling: touch !important; /* iPadで滑らかにスクロールさせる */
+    box-sizing: border-box !important; 
+    padding-top: 15px !important; 
+    min-width: 20%; 
+    
+    background-color: #fff;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    transition: background-image 0.4s ease-in-out;
+}
+
+/* リサイズバー */
+#drag-handle { 
+    width: 18px; background-color: #bbbbbb; cursor: col-resize; display: flex; 
+    justify-content: center; align-items: center; flex-shrink: 0; z-index: 100;
+    height: 100% !important; /* はみ出し防止 */
+}
+
+/* --- 右側サイドバー（コントロールパネル） --- */
+.sidebar { 
+    width: 250px; min-width: 200px; max-width: 60%; background-color: #f3e5f5; 
+    padding: 10px 15px; 
+    display: flex !important; 
+    flex-direction: column !important; 
+    gap: 6px !important; /* 隙間を詰める */
+    flex-shrink: 0; 
+    height: 100% !important; 
+    overflow-y: auto !important; /* 画面が小さい時だけスクロールを許可 */
+    -webkit-overflow-scrolling: touch !important;
+    box-sizing: border-box;
+}
+
+.sidebar-group { width: 100%; display: flex; flex-direction: column; gap: 6px; }
+
+/* セレクトボックス（Part / Paragraph） */
+.selector-container select { 
+    width: 100%; padding: 12px 10px !important; border-radius: 10px; border: 2px solid #ddd; 
+    font-size: 1.1rem !important; font-weight: bold; color: #555; margin-bottom: 2px; cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+}
+
+/* サイドバー内のボタン共通 */
+.btn { border: none; cursor: pointer; transition: 0.2s; }
+.btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+/* Play Audioボタン */
+#btnMainAudio {
+    background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%);
+    padding: 10px !important; font-size: 1.2rem; font-weight: bold; border-radius: 12px; color: #333;
+    position: relative; margin-bottom: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+#btnMainAudio::before {
+    content: ""; position: absolute; top: 4px; left: 4px; right: 4px; bottom: 4px; 
+    border: 2px dashed rgba(255, 255, 255, 0.9); border-radius: 8px; pointer-events: none;
+}
+
+/* 巻き戻し・ループボタン */
+.audio-controls, .loop-controls { display: flex; justify-content: space-between; gap: 8px; margin-top: 2px; }
+.ctrl-btn, .loop-btn { 
+    background: linear-gradient(135deg, #f5f5f5, #e0e0e0); color: #333; border: 1px solid #bbb; 
+    border-radius: 4px; flex: 1; padding: 6px 4px !important; font-size: 1rem; cursor: pointer; font-weight: bold; 
+}
+.loop-controls button { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); }
+.loop-active { background: #ffccbc !important; color: #d84315 !important; border: 2px solid #ff7043 !important; }
+hr { border: 0; border-top: 2px dashed #ce93d8; width: 100%; margin: 4px 0; }
+
+/* 右側各種モード切替ボタン */
+:root { --theme-gradient: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); }
+.stylish-btn {
+    position: relative; background: var(--theme-gradient) !important; color: #333 !important; 
+    border-radius: 12px !important; 
+    padding: 10px 8px !important; /* 縦幅を少し削って1画面に収める */
+    margin-bottom: 6px !important; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex !important; flex-direction: column !important; 
+    align-items: center !important; justify-content: center !important; line-height: 1.2 !important;
+    min-height: 50px !important;
+}
+.stylish-btn::before {
+    content: ""; position: absolute; top: 4px; left: 4px; right: 4px; bottom: 4px; 
+    border: 2px dashed rgba(255, 255, 255, 0.9); border-radius: 8px; pointer-events: none;
+}
+.stylish-btn:active { transform: scale(0.97); box-shadow: 0 2px 3px rgba(0,0,0,0.1); }
+
+.stylish-btn .main-txt { 
+    font-size: 1.3rem !important; font-weight: 900 !important; font-family: 'Nunito', sans-serif !important; letter-spacing: 0.5px !important;
+}
+.stylish-btn .sub-txt { 
+    font-size: 0.8rem !important; font-weight: 700 !important; margin-top: 2px !important; opacity: 0.9 !important; font-family: 'Noto Sans JP', sans-serif !important;
+}
+
+/* =========================================
+   メインコンテンツエリア（オーバーレイ）
+========================================= */
+#mainOverlay { 
+    position: relative !important; width: 100% !important; height: 100% !important; 
+    display: flex !important; flex-direction: column !important; box-sizing: border-box !important; 
+    padding: 0 20px 20px 20px !important; background: transparent; z-index: 10; 
+    overflow-y: auto !important; -webkit-overflow-scrolling: touch !important;
+}
+.overlay-header { 
+    display: flex; justify-content: space-between; align-items: center; 
+    border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px; flex-shrink: 0;
+}
+.overlay-title { font-size: 24px; font-weight: bold; color: #333; }
+.close-btn { background: #555; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 16px; }
+
+.font-size-btn {
+    background: #fff !important; color: #333 !important; border: 1px solid #ccc !important;
+    padding: 4px 10px !important; font-size: 1rem !important; border-radius: 4px !important;
+    cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-left: 5px;
+}
+.font-size-btn:active { background: #e0e0e0 !important; }
+
+/* =========================================
+   テキスト表示とハイライト
+========================================= */
+#textContainer { display: flex; flex-direction: column; gap: 20px; }
+.target-text-display { 
+    font-size: 26px; color: #333; line-height: 1.8; background: rgba(255,255,255,0.9); 
+    padding: 30px; border-radius: 8px; border: 1px solid #ddd; 
+}
+.eng-sentence, .jpn-sentence { cursor: pointer; border-radius: 4px; transition: background-color 0.2s ease; }
+.eng-sentence:hover, .jpn-sentence:hover { background-color: rgba(0, 0, 0, 0.05); }
+.active-highlight { background-color: #fff3cd !important; box-shadow: 0 0 0 2px #fff3cd; }
+
+.jpn-container-style {
+    background: linear-gradient(135deg, rgba(253,251,251,0.95) 0%, rgba(235,237,238,0.95) 100%); padding: 20px; 
+    border-radius: 12px; border-left: 6px solid #b0bec5; box-shadow: inset 0 2px 5px rgba(0,0,0,0.03); 
+    line-height: 1.6; margin-top: 20px;
+}
+
+/* =========================================
+   スピーチ結果（Reading Check / Shadowing）
+========================================= */
+#speechResultWindow { 
+    flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; 
+    padding-bottom: 20px; box-sizing: border-box;
+}
+
+.game-hud {
+    position: relative !important; z-index: 10 !important; margin-top: 10px !important; 
+    margin-bottom: 20px !important; width: 100% !important; box-sizing: border-box !important; 
+    display: flex; gap: 15px; align-items: center; flex-wrap: wrap; background: rgba(43,43,43,0.95); 
+    padding: 12px 20px; border-radius: 20px; box-shadow: 0 6px 15px rgba(0,0,0,0.3); border: 2px solid #444; 
+}
+.hud-badge {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 5px 15px; border-radius: 12px; border: 2px solid #fff; transform: translateY(-2px); min-width: 100px;
+}
+.hud-acc { background: linear-gradient(135deg, #00f2fe, #4facfe); box-shadow: 0 4px 0 #0088cc; }
+.hud-wpm { background: linear-gradient(135deg, #ff0844, #ffb199); box-shadow: 0 4px 0 #cc0033; }
+.hud-title { font-size: 0.7rem; font-weight: 900; color: #fff; text-shadow: 1px 1px 0 rgba(0,0,0,0.3); letter-spacing: 1px; }
+.hud-value { font-size: 1.8rem; font-weight: 900; color: #fff; text-shadow: 2px 2px 0 rgba(0,0,0,0.3); line-height: 1.1; }
+.level-select-small { padding: 5px; font-size: 0.9rem; border-radius: 6px; margin-left: 10px; cursor: pointer; }
+
+.transcription-container {
+    position: relative !important; flex-grow: 1 !important; width: 100% !important; 
+    display: flex !important; flex-direction: column !important; box-sizing: border-box !important; 
+    overflow: hidden !important; min-height: 250px;
+}
+
+.sns-box-large {
+    width: 100% !important; height: 100% !important; box-sizing: border-box !important; 
+    overflow-y: auto !important; margin: 0 !important; background: rgba(255,255,255,0.92) !important; 
+    border-radius: 20px !important; box-shadow: 0 8px 25px rgba(0,0,0,0.06) !important; 
+    border: 1px solid #f0f0f0 !important; padding: 30px !important; position: relative;
+    -webkit-overflow-scrolling: touch !important;
+}
+
+.matched-word { color: #1976D2; font-weight: bold; background-color: #E3F2FD; border-radius: 4px; padding: 2px 4px; }
+.unmatched-word { color: #555; }
+
+/* STARTボタン */
+.floating-btn {
+    position: absolute !important; bottom: 30px !important; right: 35px !important; z-index: 9999 !important; 
+    width: 90px; height: 90px; border-radius: 50% !important; background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%) !important; 
+    color: #333 !important; font-weight: 900 !important; font-size: 1.1rem !important; border: none !important; 
+    box-shadow: 0 8px 20px rgba(255, 154, 158, 0.6) !important; cursor: pointer; transition: all 0.2s ease; 
+    display: flex; align-items: center; justify-content: center;
+}
+.floating-btn:hover { transform: scale(1.08); }
+.floating-btn.recording {
+    background: linear-gradient(135deg, #ff4b4b 0%, #ff0000 100%) !important; color: white !important; 
+    box-shadow: 0 0 25px rgba(255, 0, 0, 0.8) !important; animation: pulse 1.5s infinite;
+}
+.stop-floating-btn {
+    background: linear-gradient(135deg, #4b4bff 0%, #0000ff 100%) !important; color: white !important; 
+    box-shadow: 0 8px 20px rgba(0, 0, 255, 0.4) !important;
+}
+
+/* =========================================
+   語彙ポップアップとアニメーション
+========================================= */
+.vocab-highlight { color: #d32f2f; font-weight: bold; cursor: pointer; border-bottom: 2px dashed #d32f2f; transition: 0.2s; }
+.vocab-highlight:hover { background-color: #ffebee; }
+#vocabPopup { 
+    position: absolute; display: none; background: #fff; border: 4px solid #ab47bc; border-radius: 12px; 
+    padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 100; text-align: center; 
+    min-width: 280px; transition: all 0.3s ease; 
+}
+.popup-word { font-size: 32px; font-weight: bold; color: #333; margin-bottom: 5px; }
+.popup-pron { font-size: 20px; color: #666; margin-bottom: 10px; font-family: sans-serif;}
+.popup-mean { font-size: 22px; color: #d32f2f; font-weight: bold; margin-bottom: 15px;}
+.popup-recognized { font-size: 16px; color: #1976D2; font-weight: bold; margin-bottom: 15px; min-height: 24px; background: #E3F2FD; border-radius: 4px; padding: 4px; display: none; }
+.popup-controls { display: flex; justify-content: center; gap: 15px; align-items: center; }
+.popup-mic-btn { background: #d32f2f; color: white; border: none; border-radius: 50%; width: 50px; height: 50px; cursor: pointer; font-size: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: 0.3s; }
+.popup-mic-btn.recording { background: #4caf50; animation: pulse 1s infinite; }
+.popup-close { background: #eee; border: 1px solid #ccc; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; height: 40px;}
+
+@keyframes windowSuccess { 0% { border-color: #ab47bc; box-shadow: 0 10px 30px rgba(0,0,0,0.3); } 20% { border-color: #ffeb3b; box-shadow: 0 0 50px #ffeb3b, inset 0 0 20px #ffeb3b; transform: scale(1.02); } 100% { border-color: #ab47bc; box-shadow: 0 10px 30px rgba(0,0,0,0.3); transform: scale(1); } }
+.success-anim-window { animation: windowSuccess 1.5s ease; border-color: #ab47bc !important; }
+.success-anim { animation: windowSuccess 0.8s ease; border-color: #4caf50 !important; }
+.confetti { position: fixed; top: -10px; width: 12px; height: 12px; z-index: 9999; animation: fall linear forwards; opacity: 0.9; }
+@keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
+@keyframes pulse { 0% { box-shadow: 0 4px 8px rgba(0,0,0,0.2); } 50% { box-shadow: 0 6px 20px rgba(76,175,80,0.8); } 100% { box-shadow: 0 4px 8px rgba(0,0,0,0.2); } }
+
+/* ==========================================
+   Quiz モジュール用追加スタイル (大型化＆おしゃれフォント)
+========================================== */
+.quiz-menu-container { display: flex; flex-direction: column; gap: 20px; align-items: center; justify-content: center; padding: 20px; font-family: 'Nunito', 'Noto Sans JP', sans-serif !important; }
+.quiz-menu-title { font-size: 2.2rem; font-weight: 900; color: #333; margin-bottom: 15px; }
+.quiz-mode-btn { width: 90%; max-width: 600px; padding: 20px; font-size: 1.8rem; font-weight: 900; font-family: 'Nunito', 'Noto Sans JP', sans-serif !important; border: none; border-radius: 20px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; color: white; box-shadow: 0 8px 20px rgba(0,0,0,0.15); display: flex; flex-direction: column; align-items: center; }
+.quiz-mode-btn:hover { transform: scale(1.03); box-shadow: 0 12px 25px rgba(0,0,0,0.2); }
+.quiz-mode-btn:active { transform: scale(0.97); }
+.btn-mode-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.btn-mode-2 { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); color: #333 !important; }
+.quiz-mode-subtxt { font-size: 1.1rem; font-weight: 700; margin-top: 10px; opacity: 0.9; }
+
+/* タイマーバー */
+.timer-container { width: 100%; height: 15px; background: #eee; border-radius: 8px; margin-bottom: 20px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
+.timer-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #ff4b4b, #ff8a8a); transition: width 0.1s linear; }
+
+/* 4択ボタンホバー */
+.quiz-choice-btn:hover { background: #f0f4f8 !important; transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1) !important; }
+
+/* ==========================================
+   UI微調整パッチ（ボタン縮小・サイドバー完全フィット）
+========================================== */
+
+/* 1. 上部のLesson 1-10 ボタンをスリム化 */
+.nav-container { 
+    height: auto !important; 
+    min-height: 30px !important; 
+    margin-bottom: 4px !important; 
+}
+.nav-btn { 
+    padding: 2px 2px !important; 
+    font-size: 0.8rem !important; 
+    border-radius: 8px !important; 
+}
+.nav-btn .num { 
+    font-size: 1.3rem !important; 
+}
+
+/* 2. 右側サイドバーを「スクロールなし」で1画面に収める */
+.sidebar { 
+    padding: 5px 10px !important; 
+    gap: 3px !important; 
+}
+.sidebar-group { 
+    gap: 3px !important; 
+    margin-bottom: 0 !important;
+}
+
+/* 以前巨大化したセレクトボックスを元のスマートなサイズに戻す */
+.selector-container select { 
+    padding: 6px 10px !important; 
+    font-size: 1rem !important; 
+    margin-bottom: 2px !important;
+}
+
+/* Audioボタンの縮小 */
+#btnMainAudio { 
+    padding: 6px !important; 
+    font-size: 1.1rem !important; 
+    margin-bottom: 2px !important;
+}
+.ctrl-btn, .loop-btn {
+    padding: 4px !important;
+    font-size: 0.9rem !important;
+}
+hr { margin: 3px 0 !important; }
+
+/* Reading Check等のモード切替ボタンの縮小 */
+.stylish-btn { 
+    padding: 4px !important; 
+    min-height: 38px !important; 
+    margin-bottom: 3px !important; 
+}
+.stylish-btn .main-txt { font-size: 1rem !important; }
+.stylish-btn .sub-txt { font-size: 0.65rem !important; margin-top: 0 !important; }
+
+/* 3. 不要な「@Lesson_Text」をCSSで強制非表示 */
+.overlay-title span { display: none !important; }
+.overlay-title br { display: none !important; }
+
+/* ==========================================
+   邪魔なタイトル表示を完全に削除（スペース確保）
+========================================== */
+#overlayTitle {
+    display: none !important;
+}
+
+/* ==========================================
+   Reading Check / Shadowing 上部の不要なタイトル行を強制削除
+========================================== */
+#recognizedTextDisplay > div > div[style*="border-bottom: 2px solid #f0f0f0"] {
+    display: none !important;
+}
