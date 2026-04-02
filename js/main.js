@@ -45,12 +45,12 @@ function updateParaSelect() {
     paraSelect.innerHTML = '<option value="full">Full Text (全表示)</option>';
     const paras = (lessonStructure[currentLesson] && lessonStructure[currentLesson][part]) ? lessonStructure[currentLesson][part] : [1,2,3];
     
-    // ★追加：インタビュー形式の話者名マッピング
+  // ★追加：インタビュー形式の話者名マッピング
     const speakerNames = {
         1: { // Lesson 1
-            1: { 1: "TV Reporter", 2: "Piano Player", 3: "Piano Player" }, // ※念のためp3が残っていた場合用
-            2: { 1: "News Anchor", 2: "Anchor Assistant", 3: "News Anchor" },
-            3: { 1: "Anchor Assistant", 2: "Luke Jerram", 3: "Anchor Assistant" }
+            1: { 1: "TV Reporter", 2: "Piano Player" }, // ← ここを修正しました！
+            2: { 1: "News Anchor①", 2: "Anchor Assistant", 3: "News Anchor②" },
+            3: { 1: "Anchor Assistant①", 2: "Luke Jerram", 3: "Anchor Assistant②" }
         },
         3: { // Lesson 3
             1: { 1: "Radio Personality①", 2: "Leitch①", 3: "Radio Personality②", 4: "Leitch②" },
@@ -58,7 +58,6 @@ function updateParaSelect() {
             3: { 1: "Radio Personality①", 2: "Leitch①", 3: "Radio Personality②", 4: "Leitch②" }
         }
     };
-
     paras.forEach(pNum => {
         const opt = document.createElement('option');
         opt.value = `p${pNum}`;
