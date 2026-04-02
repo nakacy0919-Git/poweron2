@@ -42,12 +42,35 @@ function updateParaSelect() {
     const part = partSelect.value;
     const prevValue = paraSelect.value;
     
-    paraSelect.innerHTML = '<option value="full">Full Text</option>';
+    paraSelect.innerHTML = '<option value="full">Full Text (全表示)</option>';
     const paras = (lessonStructure[currentLesson] && lessonStructure[currentLesson][part]) ? lessonStructure[currentLesson][part] : [1,2,3];
     
+    // ★追加：インタビュー形式の話者名マッピング
+    const speakerNames = {
+        1: { // Lesson 1
+            1: { 1: "TV Reporter", 2: "Piano Player", 3: "Piano Player" }, // ※念のためp3が残っていた場合用
+            2: { 1: "News Anchor", 2: "Anchor Assistant", 3: "News Anchor" },
+            3: { 1: "Anchor Assistant", 2: "Luke Jerram", 3: "Anchor Assistant" }
+        },
+        3: { // Lesson 3
+            1: { 1: "Radio Personality①", 2: "Leitch①", 3: "Radio Personality②", 4: "Leitch②" },
+            2: { 1: "Radio Personality①", 2: "Leitch", 3: "Radio Personality②" },
+            3: { 1: "Radio Personality①", 2: "Leitch①", 3: "Radio Personality②", 4: "Leitch②" }
+        }
+    };
+
     paras.forEach(pNum => {
         const opt = document.createElement('option');
-        opt.value = `p${pNum}`; opt.textContent = `Paragraph ${pNum}`; paraSelect.appendChild(opt);
+        opt.value = `p${pNum}`;
+        
+        // 話者名が設定されていればそれを使い、なければ通常の "Paragraph ◯" にする
+        let displayName = `Paragraph ${pNum}`;
+        if (speakerNames[currentLesson] && speakerNames[currentLesson][part] && speakerNames[currentLesson][part][pNum]) {
+            displayName = speakerNames[currentLesson][part][pNum];
+        }
+        
+        opt.textContent = displayName;
+        paraSelect.appendChild(opt);
     });
 
     if (paraSelect.querySelector(`option[value="${prevValue}"]`)) {
